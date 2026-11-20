@@ -27,6 +27,7 @@ $busca = is_string($_GET['busca'] ?? null) ? $_GET['busca'] : '';
                     </a>
                 </li>
                 <?php if ($usuario !== null): ?>
+                    <li class="nav-item"><a class="nav-link" href="<?= e(url('meus-pedidos.php')) ?>">Meus Pedidos</a></li>
                     <li class="nav-item"><span class="navbar-text"><?= e($usuario['nome']) ?></span></li>
                     <?php if ($usuario['perfil'] === 'admin'): ?>
                         <li class="nav-item"><a class="nav-link" href="<?= e(url('admin/')) ?>">Painel</a></li>
