@@ -1,0 +1,15 @@
+/.env
+/uploads/produtos/*
+!/uploads/produtos/.gitkeep
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+tmp/
+temp/

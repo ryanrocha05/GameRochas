@@ -1,0 +1,51 @@
+:root {
+    --vault-bg: #0e111b;
+    --vault-surface: #151a2a;
+    --vault-border: #303950;
+    --vault-accent: #a9f872;
+    --vault-muted: #a9b3cd;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(ellipse at top right, #203044 0, transparent 52%), var(--vault-bg);
+}
+
+.vault-navbar,
+.vault-footer {
+    background: var(--vault-surface);
+}
+
+.vault-navbar {
+    border-bottom: 1px solid var(--vault-border);
+}
+
+.vault-navbar .navbar-brand {
+    font-weight: 800;
+    letter-spacing: -.04em;
+}
+
+.vault-navbar .navbar-brand span {
+    color: var(--vault-accent);
+}
+
+.vault-badge {
+    color: var(--vault-bg);
+    background: var(--vault-accent);
+}
+
+.vault-panel {
+    max-width: 42rem;
+    padding: clamp(1.5rem, 5vw, 3rem);
+    background: var(--vault-surface);
+    border: 1px solid var(--vault-border);
+    border-inline-start: .25rem solid var(--vault-accent);
+    border-radius: .75rem;
+}
+
+.vault-footer {
+    border-top: 1px solid var(--vault-border);
+    color: var(--vault-muted);
+}
