@@ -1,5 +1,8 @@
 <?php
-$usuario = $_SESSION['usuario'] ?? null;
+require_once __DIR__ . '/../src/Auth.php';
+require_once __DIR__ . '/../src/Csrf.php';
+
+$usuario = usuario_logado();
 $quantidade = array_sum($_SESSION['carrinho'] ?? []);
 $busca = is_string($_GET['busca'] ?? null) ? $_GET['busca'] : '';
 ?>
@@ -25,7 +28,15 @@ $busca = is_string($_GET['busca'] ?? null) ? $_GET['busca'] : '';
                 </li>
                 <?php if ($usuario !== null): ?>
                     <li class="nav-item"><span class="navbar-text"><?= e($usuario['nome']) ?></span></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= e(url('logout.php')) ?>">Sair</a></li>
+                    <?php if ($usuario['perfil'] === 'admin'): ?>
+                        <li class="nav-item"><a class="nav-link" href="<?= e(url('admin/')) ?>">Painel</a></li>
+                    <?php endif; ?>
+                    <li class="nav-item">
+                        <form method="post" action="<?= e(url('logout.php')) ?>">
+                            <?= csrf_campo() ?>
+                            <button class="nav-link" type="submit">Sair</button>
+                        </form>
+                    </li>
                 <?php else: ?>
                     <li class="nav-item"><a class="nav-link" href="<?= e(url('login.php')) ?>">Entrar</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= e(url('cadastro.php')) ?>">Cadastrar</a></li>
