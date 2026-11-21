@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/src/Auth.php';
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    http_response_code(405);
+    header('Allow: GET, HEAD');
+    exit;
+}
+
 exigir_login();
 $titulo = 'Detalhes do pedido | GameVault';
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);

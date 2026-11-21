@@ -35,7 +35,17 @@ function exibir_flash(): void
     }
 }
 
+function requisicao_https(): bool
+{
+    return !empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off';
+}
+
 function url(string $caminho = ''): string
 {
-    return rtrim((string) env('APP_URL'), '/') . '/' . ltrim($caminho, '/');
+    $base = (string) env('APP_URL');
+    if (requisicao_https() && parse_url($base, PHP_URL_SCHEME) === 'http') {
+        // Conserva a origem HTTPS da requisição, inclusive em instalações locais com porta própria.
+        $base = (string) parse_url($base, PHP_URL_PATH);
+    }
+    return rtrim($base, '/') . '/' . ltrim($caminho, '/');
 }

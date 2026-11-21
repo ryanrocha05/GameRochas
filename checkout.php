@@ -8,7 +8,17 @@ require_once __DIR__ . '/src/Csrf.php';
 
 const METODOS_PAGAMENTO = ['pix' => 'Pix', 'boleto' => 'Boleto', 'cartao' => 'Cartão'];
 
-function registrar_compra(PDO $db, int $usuarioId, mixed $pagamento, array $carrinho): int
+function assinatura_resumo(array $itens): string
+{
+    $valores = [];
+    foreach ($itens as $item) {
+        $valores[(int) $item['id']] = [(string) $item['preco'], (int) $item['quantidade']];
+    }
+    ksort($valores, SORT_NUMERIC);
+    return hash('sha256', serialize($valores));
+}
+
+function registrar_compra(PDO $db, int $usuarioId, mixed $pagamento, array $carrinho, mixed $resumo): int
 {
     $db->beginTransaction();
     try {
@@ -18,8 +28,7 @@ function registrar_compra(PDO $db, int $usuarioId, mixed $pagamento, array $carr
 
         ksort($carrinho, SORT_NUMERIC);
         $travar = $db->prepare('SELECT preco, ativo, estoque FROM produtos WHERE id = ? FOR UPDATE');
-        $precos = [];
-        $centavos = 0;
+        $itens = [];
         foreach ($carrinho as $id => $qtd) {
             $travar->execute([$id]);
             $produto = $travar->fetch();
@@ -28,12 +37,15 @@ function registrar_compra(PDO $db, int $usuarioId, mixed $pagamento, array $carr
                 throw new DomainException('O estoque mudou ou um produto ficou indisponível. Revise o carrinho.');
             }
 
-            $precos[$id] = (string) $produto['preco'];
-            $unitario = (int) str_replace('.', '', $precos[$id]);
-            if ($unitario > intdiv(9999999999 - $centavos, $qtd)) {
-                throw new DomainException('O valor do pedido ultrapassa o limite permitido. Revise o carrinho.');
-            }
-            $centavos += $unitario * $qtd;
+            $itens[] = ['id' => $id, 'preco' => $produto['preco'], 'quantidade' => $qtd];
+        }
+
+        $centavos = cart_total_centavos($itens);
+        if ($centavos === null) {
+            throw new DomainException('O valor do pedido ultrapassa o limite permitido. Revise o carrinho.');
+        }
+        if (!is_string($resumo) || !hash_equals(assinatura_resumo($itens), $resumo)) {
+            throw new DomainException('Os itens ou preços mudaram. Revise o carrinho e confirme o novo total.');
         }
 
         $total = sprintf('%d.%02d', intdiv($centavos, 100), $centavos % 100);
@@ -49,8 +61,10 @@ function registrar_compra(PDO $db, int $usuarioId, mixed $pagamento, array $carr
         $baixa = $db->prepare(
             'UPDATE produtos SET estoque = estoque - ? WHERE id = ? AND ativo = 1 AND estoque >= ?'
         );
-        foreach ($carrinho as $id => $qtd) {
-            $item->execute([$pedidoId, $id, $qtd, $precos[$id]]);
+        foreach ($itens as $linha) {
+            $id = $linha['id'];
+            $qtd = $linha['quantidade'];
+            $item->execute([$pedidoId, $id, $qtd, $linha['preco']]);
             $baixa->execute([$qtd, $id, $qtd]);
             if ($baixa->rowCount() !== 1) {
                 throw new DomainException('Não foi possível reservar o estoque. Revise o carrinho.');
@@ -89,7 +103,9 @@ if (!$carrinho) {
 if ($post) {
     $destino = $checkoutUrl;
     try {
-        $pedidoId = registrar_compra(Database::getConnection(), $usuarioId, $_POST['forma_pagamento'] ?? null, $carrinho);
+        $pedidoId = registrar_compra(
+            Database::getConnection(), $usuarioId, $_POST['forma_pagamento'] ?? null, $carrinho, $_POST['resumo'] ?? null
+        );
         cart_limpar();
         $destino = url('pedido-sucesso.php?id=' . $pedidoId);
     } catch (InvalidArgumentException $erro) {
@@ -115,7 +131,11 @@ try {
     if (!$itens) {
         redirecionar($carrinhoUrl);
     }
-    $total = cart_total();
+    $total = cart_total_centavos($itens);
+    if ($total === null) {
+        flash('warning', 'O valor do pedido ultrapassa o limite permitido. Revise o carrinho.');
+        redirecionar($carrinhoUrl);
+    }
 } catch (PDOException $erro) {
     error_log('GameVault: ' . $erro->getMessage());
     http_response_code(500);
@@ -136,11 +156,11 @@ require __DIR__ . '/templates/header.php';
                     <?php foreach ($itens as $item): ?>
                         <li class="list-group-item d-flex justify-content-between gap-3">
                             <span><?= e($item['nome']) ?> × <?= e((string) $item['quantidade']) ?></span>
-                            <span class="text-nowrap"><?= e(moeda($item['preco'] * $item['quantidade'])) ?></span>
+                            <span class="text-nowrap"><?= e(moeda(cart_subtotal_centavos($item) / 100)) ?></span>
                         </li>
                     <?php endforeach; ?>
                 </ul>
-                <p class="fw-bold">Total <?= e(moeda($total)) ?></p>
+                <p class="fw-bold">Total <?= e(moeda($total / 100)) ?></p>
                 <a href="<?= e($carrinhoUrl) ?>">Voltar ao carrinho</a>
             </div>
         </section>
@@ -150,6 +170,7 @@ require __DIR__ . '/templates/header.php';
                 <p><?= e($comprador['nome']) ?><br><?= e($comprador['email']) ?></p>
                 <form method="post" action="<?= e($checkoutUrl) ?>">
                     <?= csrf_campo() ?>
+                    <input type="hidden" name="resumo" value="<?= e(assinatura_resumo($itens)) ?>">
                     <fieldset class="mb-3">
                         <legend class="h4">Pagamento simulado</legend>
                         <p>Esta compra é uma simulação e não gera cobrança. Use somente dados fictícios.</p>

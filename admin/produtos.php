@@ -44,7 +44,12 @@ function guardar_imagem_produto(array $arquivo): ?string
     $extensoes = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
     $mime = finfo_file(new finfo(FILEINFO_MIME_TYPE), $temporario);
     $extensao = $extensoes[$mime] ?? null;
-    if ($extensao === null) {
+    $nome = $arquivo['name'] ?? null;
+    $original = is_string($nome) ? strtolower(pathinfo($nome, PATHINFO_EXTENSION)) : '';
+    if ($original === 'jpeg') {
+        $original = 'jpg';
+    }
+    if ($extensao === null || $original !== $extensao) {
         throw new DomainException('Envie uma imagem JPEG, PNG ou WebP.');
     }
 

@@ -67,11 +67,6 @@ INSERT INTO categorias (nome) VALUES
     ('Ação'), ('Aventura'), ('RPG'), ('Corrida'), ('Estratégia')
 ON DUPLICATE KEY UPDATE id = id;
 
-INSERT INTO usuarios (nome, email, senha_hash, perfil) VALUES
-    ('Administrador de teste', 'admin@gamevault.com', '$2y$12$4uFSrdEDOWsRWnTiGXAQcOCHFPeO3kwF7v8g/nAbwiZ30dylZcepO', 'admin'),
-    ('Cliente de teste', 'cliente@gamevault.com', '$2y$12$g3AHet5k/06Hr8GxPTTJp.4WdFmT5yXoaigaoHB1XU.mp6CqHGV26', 'cliente')
-ON DUPLICATE KEY UPDATE id = id;
-
 -- A imagem identifica cada produto da carga inicial.
 INSERT INTO produtos (categoria_id, nome, preco, estoque, imagem, ativo)
 SELECT categorias.id, carga.nome, carga.preco, carga.estoque, carga.imagem, carga.ativo

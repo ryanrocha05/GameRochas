@@ -4,15 +4,10 @@ declare(strict_types=1);
 
 function env(string $chave, mixed $padrao = null): mixed
 {
-    return $_ENV[$chave] ?? $padrao;
+    return GAMEVAULT_CONFIG[$chave] ?? $padrao;
 }
 
 $arquivoEnv = dirname(__DIR__) . '/.env';
-if (!is_file($arquivoEnv)) {
-    http_response_code(500);
-    exit('Arquivo .env ausente. Copie .env.example para .env.');
-}
-
 $linhasEnv = @file($arquivoEnv, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 if ($linhasEnv === false) {
     error_log('GameVault: falha ao ler o arquivo .env.');
@@ -20,6 +15,7 @@ if ($linhasEnv === false) {
     exit('Não foi possível carregar a configuração da aplicação.');
 }
 
+$configuracao = [];
 foreach ($linhasEnv as $linha) {
     $linha = trim($linha);
     if ($linha === '' || str_starts_with($linha, '#') || !str_contains($linha, '=')) {
@@ -31,6 +27,16 @@ foreach ($linhasEnv as $linha) {
         continue;
     }
 
-    $_ENV[$chave] = $valor;
-    putenv($chave . '=' . $valor);
+    $configuracao[$chave] = $valor;
 }
+
+foreach (['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS', 'APP_URL'] as $obrigatoria) {
+    if (!isset($configuracao[$obrigatoria]) || ($obrigatoria !== 'DB_PASS' && $configuracao[$obrigatoria] === '')) {
+        error_log('GameVault: chave de configuração ausente ou vazia: ' . $obrigatoria);
+        http_response_code(500);
+        exit('Não foi possível carregar a configuração da aplicação.');
+    }
+}
+
+define('GAMEVAULT_CONFIG', $configuracao);
+unset($configuracao, $linhasEnv, $linha, $chave, $valor);

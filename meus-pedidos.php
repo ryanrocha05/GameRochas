@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/src/Auth.php';
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    http_response_code(405);
+    header('Allow: GET, HEAD');
+    exit;
+}
+
 exigir_login();
 $titulo = 'Meus Pedidos | GameVault';
 $pedidos = [];

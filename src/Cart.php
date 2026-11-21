@@ -97,29 +97,27 @@ function cart_itens(): array
     return $itens;
 }
 
-function cart_total(): string
+const LIMITE_PEDIDO_CENTAVOS = 9999999999;
+
+function cart_subtotal_centavos(array $item): ?int
 {
-    $carrinho = $_SESSION['carrinho'] ?? [];
-    if (!$carrinho) {
-        return '0.00';
+    $unitario = (int) str_replace('.', '', $item['preco']);
+    $quantidade = (int) $item['quantidade'];
+    if ($quantidade < 1 || $unitario > intdiv(LIMITE_PEDIDO_CENTAVOS, $quantidade)) {
+        return null;
     }
+    return $unitario * $quantidade;
+}
 
-    $casos = [];
-    $parametros = [];
-    $ids = array_keys($carrinho);
-    foreach ($carrinho as $id => $qtd) {
-        $casos[] = 'WHEN ? THEN CAST(? AS UNSIGNED)';
-        $parametros[] = $id;
-        $parametros[] = $qtd;
+function cart_total_centavos(array $itens): ?int
+{
+    $total = 0;
+    foreach ($itens as $item) {
+        $subtotal = cart_subtotal_centavos($item);
+        if ($subtotal === null || $subtotal > LIMITE_PEDIDO_CENTAVOS - $total) {
+            return null;
+        }
+        $total += $subtotal;
     }
-
-    $quantidades = implode(' ', $casos);
-    $placeholders = implode(', ', array_fill(0, count($ids), '?'));
-    $consulta = Database::getConnection()->prepare(
-        "SELECT COALESCE(SUM(preco * LEAST(estoque, CASE id $quantidades END)), 0.00)
-         FROM produtos WHERE id IN ($placeholders) AND ativo = 1 AND estoque > 0"
-    );
-    $consulta->execute(array_merge($parametros, $ids));
-
-    return (string) $consulta->fetchColumn();
+    return $total;
 }

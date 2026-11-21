@@ -1,3 +1,13 @@
-<FilesMatch "^\.env(?:\.|$)">
+Options -Indexes
+RewriteEngine On
+RewriteRule "(^|/)\.(?:git(?:/|$)|env(?:[./]|$))|^(?:src|templates|database)(?:/|$)" - [F,NC]
+
+<FilesMatch "(?i)^\.(?:env|git)(?:\.|$)">
     Require all denied
 </FilesMatch>
+
+<IfModule php_module>
+    php_flag display_errors Off
+    php_flag display_startup_errors Off
+    php_flag log_errors On
+</IfModule>

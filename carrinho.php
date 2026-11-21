@@ -30,7 +30,7 @@ try {
         }
     } else {
         $itens = cart_itens();
-        $total = cart_total();
+        $total = cart_total_centavos($itens);
     }
 } catch (PDOException $excecao) {
     error_log('GameVault: ' . $excecao->getMessage());
@@ -72,7 +72,10 @@ require __DIR__ . '/templates/header.php';
             </thead>
             <tbody>
                 <?php foreach ($itens as $item): ?>
-                    <?php $formId = 'item-' . $item['id']; ?>
+                    <?php
+                    $formId = 'item-' . $item['id'];
+                    $subtotal = cart_subtotal_centavos($item);
+                    ?>
                     <tr data-preco="<?= e((string) $item['preco']) ?>">
                         <th scope="row">
                             <div class="d-flex align-items-center gap-3">
@@ -89,7 +92,7 @@ require __DIR__ . '/templates/header.php';
                                    max="<?= e((string) $item['estoque']) ?>" value="<?= e((string) $item['quantidade']) ?>"
                                    form="<?= e($formId) ?>" aria-label="<?= e('Quantidade de ' . $item['nome']) ?>" required>
                         </td>
-                        <td class="text-nowrap" data-subtotal><?= e(moeda($item['preco'] * $item['quantidade'])) ?></td>
+                        <td class="text-nowrap" data-subtotal><?= $subtotal === null ? 'Acima do limite' : e(moeda($subtotal / 100)) ?></td>
                         <td>
                             <form class="d-flex gap-2" id="<?= e($formId) ?>" method="post" action="<?= e($carrinhoUrl) ?>">
                                 <?= csrf_campo() ?>
@@ -107,8 +110,12 @@ require __DIR__ . '/templates/header.php';
         </table>
     </div>
     <div class="d-flex flex-wrap align-items-center justify-content-end gap-3">
-        <strong>Total geral <?= e(moeda($total)) ?></strong>
-        <a class="btn btn-primary" href="<?= e(url('checkout.php')) ?>">Finalizar compra</a>
+        <?php if ($total === null): ?>
+            <strong>O total ultrapassa o limite por pedido. Reduza as quantidades para continuar.</strong>
+        <?php else: ?>
+            <strong>Total geral <?= e(moeda($total / 100)) ?></strong>
+            <a class="btn btn-primary" href="<?= e(url('checkout.php')) ?>">Finalizar compra</a>
+        <?php endif; ?>
     </div>
     <script src="<?= e(url('assets/js/cart.js')) ?>" defer></script>
 <?php endif; ?>

@@ -6,7 +6,7 @@ require_once __DIR__ . '/bootstrap.php';
 
 function usuario_logado(): ?array
 {
-    return $_SESSION['usuario'] ?? null;
+    return $_SESSION['gamevault_usuario'] ?? null;
 }
 
 function exigir_login(): void
@@ -29,7 +29,23 @@ function exigir_admin(): void
 {
     exigir_login();
     if (usuario_logado()['perfil'] === 'admin') {
-        return;
+        try {
+            $consulta = Database::getConnection()->prepare('SELECT perfil FROM usuarios WHERE id = ?');
+            $consulta->execute([usuario_logado()['id']]);
+            $perfil = $consulta->fetchColumn();
+        } catch (PDOException $erro) {
+            error_log('GameVault: ' . $erro->getMessage());
+            http_response_code(500);
+            exit('Não foi possível verificar o acesso ao painel.');
+        }
+        if ($perfil === 'admin') {
+            return;
+        }
+        if ($perfil === false) {
+            logout();
+            redirecionar(url('login.php'));
+        }
+        $_SESSION['gamevault_usuario']['perfil'] = $perfil;
     }
 
     $inicio = url('index.php');
@@ -47,7 +63,13 @@ function login(string $email, string $senha): bool
         $consulta = $conexao->prepare('SELECT id, nome, perfil, senha_hash FROM usuarios WHERE email = :email');
         $consulta->execute(['email' => $email]);
         $usuario = $consulta->fetch();
-        if ($usuario === false || !password_verify($senha, $usuario['senha_hash'])) {
+        // Bloqueia os verificadores de senha distribuídos pela antiga carga de demonstração.
+        $hashesDeDemonstracao = [
+            'b1c0aa0009ef074d741c5357719437b65a882411e8e3df326f2df2a280c95e0b',
+            '6d7d98f6d19d04dc8767926f90d76289c7fed5dbd8ed6e9afed1f7558a6be2e8',
+        ];
+        if ($usuario === false || in_array(hash('sha256', $usuario['senha_hash']), $hashesDeDemonstracao, true)
+            || !password_verify($senha, $usuario['senha_hash'])) {
             return false;
         }
 
@@ -70,7 +92,7 @@ function login(string $email, string $senha): bool
     }
 
     unset($_SESSION['csrf_token']);
-    $_SESSION['usuario'] = [
+    $_SESSION['gamevault_usuario'] = [
         'id' => (int) $usuario['id'],
         'nome' => $usuario['nome'],
         'perfil' => $usuario['perfil'],
