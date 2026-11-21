@@ -64,50 +64,64 @@ CREATE TABLE IF NOT EXISTS itens_pedido (
 START TRANSACTION;
 
 INSERT INTO categorias (nome) VALUES
-    ('Ação'), ('Aventura'), ('RPG'), ('Corrida'), ('Estratégia')
+    ('Ação'), ('Esporte'), ('Aventura'), ('RPG'), ('Corrida'), ('Estratégia')
 ON DUPLICATE KEY UPDATE id = id;
 
--- A imagem identifica cada produto da carga inicial.
-INSERT INTO produtos (categoria_id, nome, preco, estoque, imagem, ativo)
-SELECT categorias.id, carga.nome, carga.preco, carga.estoque, carga.imagem, carga.ativo
+-- O nome identifica os produtos da carga inicial, que não inclui capas.
+INSERT INTO produtos (categoria_id, nome, descricao, preco, estoque, imagem, ativo)
+SELECT categorias.id, carga.nome, carga.descricao, carga.preco, carga.estoque, NULL, 1
 FROM (
-    SELECT 'Ação' AS categoria, 'Neon Run' AS nome, 89.90 AS preco, 12 AS estoque,
-           'assets/img/neon-run.jpg' AS imagem, 1 AS ativo
+    SELECT 'Ação' AS categoria, 'DOOM Eternal' AS nome,
+           'Encare hordas de demônios com um arsenal pesado e combates em ritmo acelerado.' AS descricao, 129.90 AS preco, 12 AS estoque
     UNION ALL
-    SELECT 'Ação', 'Fronteira Zero', 119.90, 8, 'assets/img/fronteira-zero.jpg', 1
+    SELECT 'Ação', 'Hades',
+           'Desafie os deuses do Olimpo e encontre novas armas a cada tentativa de fuga do submundo.', 79.90, 8
     UNION ALL
-    SELECT 'Ação', 'Cerco Orbital', 74.90, 0, 'assets/img/cerco-orbital.jpg', 1
+    SELECT 'Esporte', 'EA SPORTS FC 25',
+           'Monte seu elenco e dispute partidas com clubes e seleções de todo o mundo.', 199.90, 0
     UNION ALL
-    SELECT 'Ação', 'Pulso Metal', 99.90, 7, 'assets/img/pulso-metal.jpg', 1
+    SELECT 'Esporte', 'NBA 2K25',
+           'Leve seu time às quadras e dispute a temporada com estrelas da NBA.', 179.90, 7
     UNION ALL
-    SELECT 'Aventura', 'Ilhas do Vento', 79.90, 15, 'assets/img/ilhas-do-vento.jpg', 1
+    SELECT 'Aventura', 'Hogwarts Legacy',
+           'Explore Hogwarts, aprenda feitiços e desvende segredos do mundo bruxo.', 249.90, 15
     UNION ALL
-    SELECT 'Aventura', 'Mapa das Marés', 59.90, 11, 'assets/img/mapa-das-mares.jpg', 1
+    SELECT 'Aventura', 'It Takes Two',
+           'Resolva desafios em dupla numa aventura cooperativa que muda a cada fase.', 99.90, 11
     UNION ALL
-    SELECT 'Aventura', 'Farol do Norte', 69.90, 5, 'assets/img/farol-do-norte.jpg', 1
+    SELECT 'Aventura', 'Stray',
+           'Explore uma cidade habitada por robôs na pele de um gato perdido.', 89.90, 5
     UNION ALL
-    SELECT 'RPG', 'Crônicas de Aurora', 139.90, 9, 'assets/img/cronicas-de-aurora.jpg', 1
+    SELECT 'RPG', 'Baldur’s Gate 3',
+           'Reúna seu grupo e tome decisões que mudam o rumo desta aventura em Faerûn.', 199.90, 9
     UNION ALL
-    SELECT 'RPG', 'Reino de Cinzas', 129.90, 0, 'assets/img/reino-de-cinzas.jpg', 1
+    SELECT 'RPG', 'Elden Ring',
+           'Explore as Terras Intermédias e enfrente chefes com sua própria combinação de armas e magia.', 249.90, 0
     UNION ALL
-    SELECT 'RPG', 'Vale dos Ecos', 109.90, 6, 'assets/img/vale-dos-ecos.jpg', 1
+    SELECT 'RPG', 'Cyberpunk 2077',
+           'Construa sua reputação como mercenário nas ruas de Night City.', 199.90, 6
     UNION ALL
-    SELECT 'Corrida', 'Asfalto Noturno', 89.90, 14, 'assets/img/asfalto-noturno.jpg', 1
+    SELECT 'Corrida', 'Forza Horizon 5',
+           'Explore as estradas do México e dispute provas com carros de várias categorias.', 249.90, 14
     UNION ALL
-    SELECT 'Corrida', 'Rali da Serra', 79.90, 10, 'assets/img/rali-da-serra.jpg', 1
+    SELECT 'Corrida', 'Assetto Corsa Competizione',
+           'Dispute corridas de GT em pistas oficiais com foco em simulação.', 129.90, 10
     UNION ALL
-    SELECT 'Corrida', 'Curva Final', 64.90, 3, 'assets/img/curva-final.jpg', 0
+    SELECT 'Corrida', 'Need for Speed Heat',
+           'Corra de dia para ganhar dinheiro e fuja da polícia à noite em Palm City.', 149.90, 3
     UNION ALL
-    SELECT 'Estratégia', 'Rota Estelar', 99.90, 13, 'assets/img/rota-estelar.jpg', 1
+    SELECT 'Estratégia', 'Sid Meier’s Civilization VI',
+           'Guie uma civilização da Antiguidade à era moderna por meio de ciência, diplomacia e conquistas.', 129.90, 13
     UNION ALL
-    SELECT 'Estratégia', 'Forte de Inverno', 84.90, 4, 'assets/img/forte-de-inverno.jpg', 1
+    SELECT 'Estratégia', 'Age of Empires IV',
+           'Comande civilizações medievais, fortaleça sua economia e lidere exércitos em batalha.', 149.90, 4
     UNION ALL
-    SELECT 'Estratégia', 'Cidade de Cobre', 74.90, 8, 'assets/img/cidade-de-cobre.jpg', 1
+    SELECT 'Estratégia', 'XCOM 2',
+           'Coordene uma resistência e planeje cada movimento em combates táticos por turnos.', 99.90, 8
 ) AS carga
 JOIN categorias ON categorias.nome = carga.categoria
 WHERE NOT EXISTS (
-    SELECT 1 FROM produtos WHERE produtos.imagem = carga.imagem
+    SELECT 1 FROM produtos WHERE produtos.nome = carga.nome
 );
 
 COMMIT;
-

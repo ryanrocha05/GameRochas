@@ -91,7 +91,7 @@ if ($post) {
     redirecionar_categorias($destino);
 }
 
-$titulo = 'Categorias | GameVault';
+$titulo = 'Categorias | GameRochas';
 $editar = filter_input(INPUT_GET, 'editar', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $categoriaEdicao = null;
 $falha = false;

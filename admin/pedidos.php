@@ -80,7 +80,7 @@ if ($post) {
     exit;
 }
 
-$titulo = 'Pedidos | GameVault';
+$titulo = 'Pedidos | GameRochas';
 $pedidoId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $erroPagina = null;
 $db = Database::getConnection();

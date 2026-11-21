@@ -13,10 +13,10 @@ $linksPainel = [
 ];
 ?>
 <nav class="mb-4" aria-label="Navegação do painel administrativo">
-    <ul class="nav nav-pills flex-wrap gap-2">
+    <ul class="nav flex-wrap gap-2">
         <?php foreach ($linksPainel as $caminho => $rotuloPainel): ?>
             <li class="nav-item">
-                <a class="nav-link link-light border" href="<?= e(url($caminho)) ?>"><?= e($rotuloPainel) ?></a>
+                <a class="btn btn-outline-light btn-sm" href="<?= e(url($caminho)) ?>"><?= e($rotuloPainel) ?></a>
             </li>
         <?php endforeach; ?>
     </ul>

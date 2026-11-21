@@ -121,7 +121,7 @@ if ($post) {
     exit;
 }
 
-$titulo = 'Finalizar compra | GameVault';
+$titulo = 'Finalizar compra | GameRochas';
 $comprador = false;
 try {
     $consulta = Database::getConnection()->prepare('SELECT nome, email FROM usuarios WHERE id = ?');
@@ -149,7 +149,7 @@ require __DIR__ . '/templates/header.php';
     <p class="alert alert-danger" role="alert">Não foi possível carregar os dados da compra.</p>
 <?php else: ?>
     <div class="row g-4">
-        <section class="col-md-6">
+        <section class="col-lg-5">
             <div class="vault-panel">
                 <h2 class="h4">Resumo do carrinho</h2>
                 <ul class="list-group list-group-flush mb-3">
@@ -160,11 +160,11 @@ require __DIR__ . '/templates/header.php';
                         </li>
                     <?php endforeach; ?>
                 </ul>
-                <p class="fw-bold">Total <?= e(moeda($total / 100)) ?></p>
+                <p class="vault-price fs-5">Total <?= e(moeda($total / 100)) ?></p>
                 <a href="<?= e($carrinhoUrl) ?>">Voltar ao carrinho</a>
             </div>
         </section>
-        <section class="col-md-6">
+        <section class="col-lg-7">
             <div class="vault-panel">
                 <h2 class="h4">Dados do comprador</h2>
                 <p><?= e($comprador['nome']) ?><br><?= e($comprador['email']) ?></p>
@@ -197,7 +197,7 @@ require __DIR__ . '/templates/header.php';
                             </div>
                         </div>
                     </details>
-                    <button type="submit" class="btn btn-primary">Confirmar compra simulada</button>
+                    <button type="submit" class="btn btn-primary w-100">Confirmar compra simulada</button>
                 </form>
             </div>
         </section>

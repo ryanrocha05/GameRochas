@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$titulo = 'Criar conta | GameVault';
+$titulo = 'Criar conta | GameRochas';
 require __DIR__ . '/templates/header.php';
 ?>
 <section class="vault-panel mx-auto col-md-7 col-lg-5">

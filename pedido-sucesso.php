@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 exigir_login();
-$titulo = 'Detalhes do pedido | GameVault';
+$titulo = 'Detalhes do pedido | GameRochas';
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $pedido = false;
 $itens = [];

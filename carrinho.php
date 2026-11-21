@@ -7,7 +7,7 @@ require_once __DIR__ . '/src/Csrf.php';
 
 $carrinhoUrl = url('carrinho.php');
 $post = $_SERVER['REQUEST_METHOD'] === 'POST';
-$titulo = 'Carrinho | GameVault';
+$titulo = 'Carrinho | GameRochas';
 $itens = [];
 $erro = null;
 
@@ -109,11 +109,11 @@ require __DIR__ . '/templates/header.php';
             </tbody>
         </table>
     </div>
-    <div class="d-flex flex-wrap align-items-center justify-content-end gap-3">
+    <div class="vault-summary d-flex flex-wrap align-items-center justify-content-sm-end gap-3">
         <?php if ($total === null): ?>
             <strong>O total ultrapassa o limite por pedido. Reduza as quantidades para continuar.</strong>
         <?php else: ?>
-            <strong>Total geral <?= e(moeda($total / 100)) ?></strong>
+            <strong class="vault-price fs-5">Total geral <?= e(moeda($total / 100)) ?></strong>
             <a class="btn btn-primary" href="<?= e(url('checkout.php')) ?>">Finalizar compra</a>
         <?php endif; ?>
     </div>

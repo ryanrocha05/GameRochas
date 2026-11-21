@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $erro = 'E-mail ou senha inválidos.';
 }
 
-$titulo = 'Entrar | GameVault';
+$titulo = 'Entrar | GameRochas';
 require __DIR__ . '/templates/header.php';
 ?>
 <section class="vault-panel mx-auto col-md-7 col-lg-5">

@@ -215,7 +215,7 @@ if ($post) {
     voltar_produtos($destino);
 }
 
-$titulo = 'Produtos | GameVault';
+$titulo = 'Produtos | GameRochas';
 $editar = filter_input(INPUT_GET, 'editar', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 $produtoEdicao = null;
 $falha = false;

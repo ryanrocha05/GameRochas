@@ -69,10 +69,8 @@ if ($produto) {
     [$status, $cor] = match (true) {
         $estoque === 0 => ['Esgotado', 'text-bg-secondary'],
         $estoque <= 5 => ["Últimas $estoque unidades", 'text-bg-warning'],
-        default => ['Em estoque', 'text-bg-success'],
+        default => ["$estoque unidades em estoque", 'text-bg-success'],
     };
-    $fallback = 'data:image/svg+xml,' . rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="#151a2a"/><text x="50%" y="50%" fill="#a9b3cd" text-anchor="middle" font-family="sans-serif" font-size="24">Imagem indisponível</text></svg>');
-    $imagem = empty($produto['imagem']) ? $fallback : url($produto['imagem']);
 }
 
 require __DIR__ . '/templates/header.php';
@@ -84,32 +82,36 @@ require __DIR__ . '/templates/header.php';
         <p class="mb-0"><?= e($mensagem) ?></p>
     </section>
 <?php else: ?>
-    <article class="row g-4">
+    <article class="row g-4 g-xl-5 align-items-start">
         <div class="col-lg-6">
-            <img class="img-fluid rounded w-100" src="<?= e($imagem) ?>" alt="<?= e('Capa de ' . $produto['nome']) ?>"
-                 data-fallback="<?= e($fallback) ?>" onerror="this.onerror=null; this.src=this.dataset.fallback">
+            <div class="vault-detail-cover">
+                <?php require __DIR__ . '/templates/capa.php'; ?>
+            </div>
         </div>
         <div class="col-lg-6">
-            <p class="text-body-secondary mb-1"><?= e($produto['categoria']) ?></p>
-            <h1><?= e($produto['nome']) ?></h1>
-            <p class="fs-4 fw-bold"><?= e(moeda($produto['preco'])) ?></p>
-            <p><span class="badge <?= e($cor) ?>"><?= e($status) ?></span></p>
-            <p><?= nl2br(e($produto['descricao'] ?? 'Descrição indisponível.')) ?></p>
-            <form method="post" action="<?= e($detalhe) ?>">
-                <?= csrf_campo() ?>
-                <?php if ($disponivel > 0): ?>
-                    <div class="mb-3">
-                        <label class="form-label" for="quantidade">Quantidade</label>
-                        <input class="form-control w-auto" type="number" id="quantidade" name="quantidade"
-                               min="1" max="<?= e((string) $disponivel) ?>" value="1" required>
-                    </div>
-                <?php elseif ($estoque > 0): ?>
-                    <p class="text-body-secondary">Você já adicionou ao carrinho toda a quantidade disponível.</p>
-                <?php endif; ?>
-                <button class="btn btn-primary" type="submit" <?= $disponivel === 0 ? 'disabled' : '' ?>>
-                    Adicionar ao carrinho
-                </button>
-            </form>
+            <div class="vault-panel">
+                <p class="vault-category mb-2"><?= e($produto['categoria']) ?></p>
+                <h1><?= e($produto['nome']) ?></h1>
+                <p class="vault-price h3"><?= e(moeda($produto['preco'])) ?></p>
+                <p><span class="badge <?= e($cor) ?>"><?= e($status) ?></span></p>
+                <h2 class="h5">Descrição do jogo</h2>
+                <p><?= nl2br(e($produto['descricao'] ?? 'Descrição indisponível.')) ?></p>
+                <form method="post" action="<?= e($detalhe) ?>">
+                    <?= csrf_campo() ?>
+                    <?php if ($disponivel > 0): ?>
+                        <div class="mb-3">
+                            <label class="form-label" for="quantidade">Quantidade</label>
+                            <input class="form-control w-auto" type="number" id="quantidade" name="quantidade"
+                                   min="1" max="<?= e((string) $disponivel) ?>" value="1" required>
+                        </div>
+                    <?php elseif ($estoque > 0): ?>
+                        <p class="text-body-secondary">Você já adicionou ao carrinho toda a quantidade disponível.</p>
+                    <?php endif; ?>
+                    <button class="btn btn-primary" type="submit" <?= $disponivel === 0 ? 'disabled' : '' ?>>
+                        Adicionar ao carrinho
+                    </button>
+                </form>
+            </div>
         </div>
     </article>
 <?php endif; ?>

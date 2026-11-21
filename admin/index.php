@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_guard.php';
 
-$titulo = 'Painel administrativo | GameVault';
+$titulo = 'Painel administrativo | GameRochas';
 $erro = false;
 try {
     $db = Database::getConnection();

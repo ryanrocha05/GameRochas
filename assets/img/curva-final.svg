@@ -1,9 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" role="img" aria-labelledby="titulo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="32 8 416 234" role="img" aria-labelledby="titulo">
   <title id="titulo">Curva Final</title>
   <rect width="480" height="320" fill="#151924"/>
   <rect x="48" y="48" width="384" height="160" rx="24" fill="#EFA545"/>
   <path d="M152 128h72m-36-36v72" stroke="#151924" stroke-width="16" stroke-linecap="round"/>
   <circle cx="292" cy="144" r="10" fill="#151924"/>
   <circle cx="324" cy="112" r="10" fill="#151924"/>
-  <text x="240" y="267" text-anchor="middle" font-family="sans-serif" font-size="26" fill="#ffffff">Curva Final</text>
 </svg>

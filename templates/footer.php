@@ -1,6 +1,6 @@
     </main>
     <footer class="vault-footer py-3">
-        <div class="container">GameVault</div>
+        <div class="container">GameRochas</div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

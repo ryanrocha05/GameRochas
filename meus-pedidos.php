@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 exigir_login();
-$titulo = 'Meus Pedidos | GameVault';
+$titulo = 'Meus Pedidos | GameRochas';
 $pedidos = [];
 $erro = false;
 try {

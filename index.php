@@ -62,20 +62,46 @@ try {
     $erroCatalogo = true;
 }
 
-$fallback = 'data:image/svg+xml,' . rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="#151a2a"/><text x="50%" y="50%" fill="#a9b3cd" text-anchor="middle" font-family="sans-serif" font-size="24">Imagem indisponível</text></svg>');
-$titulo = 'Catálogo | GameVault';
+$titulo = 'Catálogo | GameRochas';
 require __DIR__ . '/templates/header.php';
 ?>
-<h1 class="mb-4">Catálogo</h1>
+<?php if (!$erroCatalogo && !$filtros && $pagina === 1): ?>
+    <?php
+    $arteDestaque = null;
+    foreach (['webp', 'jpg', 'jpeg', 'png'] as $extensao) {
+        $caminhoArte = 'assets/img/gta6-banner.' . $extensao;
+        if (is_file(__DIR__ . '/' . $caminhoArte)) {
+            $arteDestaque = $caminhoArte;
+            break;
+        }
+    }
+    ?>
+    <section class="vault-feature mb-4" aria-labelledby="destaque-gta">
+        <?php if ($arteDestaque !== null): ?>
+            <div class="vault-feature-art" aria-hidden="true">
+                <img src="<?= e(url($arteDestaque)) ?>" alt="">
+            </div>
+        <?php else: ?>
+            <span class="vault-feature-mark" aria-hidden="true">VI</span>
+        <?php endif; ?>
+        <div class="vault-feature-content">
+            <span class="vault-feature-label">Destaque</span>
+            <h2 id="destaque-gta">GTA <span>6</span></h2>
+            <p>De volta a Vice City. Explore as ruas de Leonida com Lucia e Jason.</p>
+            <a class="btn btn-primary" href="<?= e(url('index.php?' . http_build_query(['busca' => 'GTA']))) ?>">Ver GTA no catálogo</a>
+        </div>
+    </section>
+<?php endif; ?>
+<h1 class="vault-catalog-title mb-3">Catálogo</h1>
 <?php if ($erroCatalogo): ?>
     <p class="alert alert-danger" role="alert">Não foi possível carregar o catálogo.</p>
 <?php else: ?>
-    <form method="get" action="<?= e(url('index.php')) ?>" class="row g-3 align-items-end mb-4">
-        <div class="col-md-5">
+    <form method="get" action="<?= e(url('index.php')) ?>" class="vault-filter mb-4">
+        <div>
             <label for="busca" class="form-label">Buscar por nome ou descrição</label>
             <input type="search" name="busca" id="busca" class="form-control" value="<?= e($busca) ?>">
         </div>
-        <div class="col-md-4">
+        <div>
             <label for="categoria" class="form-label">Categoria</label>
             <select name="categoria" id="categoria" class="form-select">
                 <option value="">Todas as categorias</option>
@@ -86,7 +112,7 @@ require __DIR__ . '/templates/header.php';
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="col-md-auto">
+        <div class="d-flex flex-wrap gap-2">
             <button class="btn btn-primary" type="submit">Filtrar</button>
             <?php if ($filtros): ?>
                 <a class="btn btn-outline-light" href="<?= e(url('index.php')) ?>">Limpar</a>
@@ -97,38 +123,35 @@ require __DIR__ . '/templates/header.php';
     <?php if (!$produtos): ?>
         <p class="alert alert-secondary">Nenhum produto encontrado.</p>
     <?php else: ?>
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        <div class="vault-catalog-grid">
             <?php foreach ($produtos as $produto): ?>
                 <?php
                 $estoque = (int) $produto['estoque'];
                 $detalhe = url('produto.php?' . http_build_query(['id' => $produto['id']] + $filtros + ['pagina' => $pagina]));
-                $imagem = empty($produto['imagem']) ? $fallback : url($produto['imagem']);
                 ?>
-                <div class="col">
-                    <article class="card h-100">
-                        <img class="card-img-top object-fit-cover" style="aspect-ratio: 16 / 9"
-                             src="<?= e($imagem) ?>" alt="<?= e('Capa de ' . $produto['nome']) ?>"
-                             data-fallback="<?= e($fallback) ?>" onerror="this.onerror=null; this.src=this.dataset.fallback">
-                        <div class="card-body d-flex flex-column">
-                            <p class="text-body-secondary mb-1"><?= e($produto['categoria']) ?></p>
-                            <h2 class="h5"><a href="<?= e($detalhe) ?>" class="link-light"><?= e($produto['nome']) ?></a></h2>
-                            <p class="fw-bold mb-2"><?= e(moeda($produto['preco'])) ?></p>
-                            <p class="mb-3">
-                                <span class="badge <?= $estoque > 0 ? 'text-bg-success' : 'text-bg-secondary' ?>">
-                                    <?= $estoque > 0 ? 'Em estoque' : 'Esgotado' ?>
-                                </span>
-                            </p>
-                            <form method="post" action="<?= e($detalhe) ?>" class="mt-auto">
-                                <?= csrf_campo() ?>
-                                <input type="hidden" name="quantidade" value="1">
-                                <input type="hidden" name="origem" value="catalogo">
-                                <button class="btn btn-primary w-100" type="submit" <?= $estoque === 0 ? 'disabled' : '' ?>>
-                                    Adicionar ao carrinho
-                                </button>
-                            </form>
+                <article class="card vault-product-card">
+                    <a class="d-block" href="<?= e($detalhe) ?>" aria-label="<?= e('Ver detalhes de ' . $produto['nome']) ?>">
+                        <?php require __DIR__ . '/templates/capa.php'; ?>
+                    </a>
+                    <div class="card-body d-flex flex-column">
+                        <p class="vault-category mb-1"><?= e($produto['categoria']) ?></p>
+                        <h2 class="h5 mb-3"><a href="<?= e($detalhe) ?>"><?= e($produto['nome']) ?></a></h2>
+                        <div class="vault-card-meta mt-auto mb-3">
+                            <p class="vault-price h4 mb-0"><?= e(moeda($produto['preco'])) ?></p>
+                            <span class="badge <?= $estoque > 0 ? 'text-bg-success' : 'text-bg-secondary' ?>">
+                                <?= $estoque > 0 ? 'Em estoque' : 'Esgotado' ?>
+                            </span>
                         </div>
-                    </article>
-                </div>
+                        <form method="post" action="<?= e($detalhe) ?>">
+                            <?= csrf_campo() ?>
+                            <input type="hidden" name="quantidade" value="1">
+                            <input type="hidden" name="origem" value="catalogo">
+                            <button class="btn btn-primary w-100" type="submit" <?= $estoque === 0 ? 'disabled' : '' ?>>
+                                Adicionar ao carrinho
+                            </button>
+                        </form>
+                    </div>
+                </article>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
