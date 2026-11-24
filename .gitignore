@@ -1,6 +1,6 @@
 /.env
-/uploads/produtos/*
-!/uploads/produtos/.gitkeep
+assets/img/uploads/*
+!assets/img/uploads/.htaccess
 .DS_Store
 Thumbs.db
 .idea/

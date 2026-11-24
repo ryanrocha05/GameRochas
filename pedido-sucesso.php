@@ -59,7 +59,7 @@ require __DIR__ . '/templates/header.php';
         <dt class="col-sm-3">Status</dt>
         <dd class="col-sm-9"><?= e(ucfirst($pedido['status'])) ?></dd>
         <dt class="col-sm-3">Forma de pagamento</dt>
-        <dd class="col-sm-9"><?= e($metodos[$pedido['forma_pagamento']]) ?> (simulado)</dd>
+        <dd class="col-sm-9"><?= e($metodos[$pedido['forma_pagamento']]) ?></dd>
     </dl>
     <div class="table-responsive">
         <table class="table align-middle">

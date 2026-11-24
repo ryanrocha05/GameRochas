@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="<?= e(url('assets/css/style.css?v=' . filemtime(__DIR__ . '/../assets/css/style.css'))) ?>">
 </head>
 <body>
+    <a class="vault-skip" href="#conteudo">Pular para o conteúdo</a>
     <?php require __DIR__ . '/navbar.php'; ?>
-    <main class="container flex-grow-1 py-4 py-lg-5">
+    <main id="conteudo" tabindex="-1" class="container flex-grow-1 vault-main">
         <?php exibir_flash(); ?>

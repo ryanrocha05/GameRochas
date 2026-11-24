@@ -63,6 +63,7 @@ try {
 }
 
 $titulo = 'Catálogo | GameRochas';
+$secaoLoja = 'catalogo';
 require __DIR__ . '/templates/header.php';
 ?>
 <?php if (!$erroCatalogo && !$filtros && $pagina === 1): ?>
@@ -76,7 +77,7 @@ require __DIR__ . '/templates/header.php';
         }
     }
     ?>
-    <section class="vault-feature mb-4" aria-labelledby="destaque-gta">
+    <section class="vault-feature" aria-labelledby="destaque-gta">
         <?php if ($arteDestaque !== null): ?>
             <div class="vault-feature-art" aria-hidden="true">
                 <img src="<?= e(url($arteDestaque)) ?>" alt="">
@@ -85,14 +86,14 @@ require __DIR__ . '/templates/header.php';
             <span class="vault-feature-mark" aria-hidden="true">VI</span>
         <?php endif; ?>
         <div class="vault-feature-content">
-            <span class="vault-feature-label">Destaque</span>
-            <h2 id="destaque-gta">GTA <span>6</span></h2>
-            <p>De volta a Vice City. Explore as ruas de Leonida com Lucia e Jason.</p>
+            <span class="vault-feature-label">Jogo em destaque</span>
+            <h2 id="destaque-gta">Grand Theft<br>Auto <span>VI</span></h2>
+            <p>De volta a Vice City. Percorra as ruas de Leonida com Lucia e Jason.</p>
             <a class="btn btn-primary" href="<?= e(url('index.php?' . http_build_query(['busca' => 'GTA']))) ?>">Ver GTA no catálogo</a>
         </div>
     </section>
 <?php endif; ?>
-<h1 class="vault-catalog-title mb-3">Catálogo</h1>
+<h1 class="vault-catalog-title">Catálogo de jogos</h1>
 <?php if ($erroCatalogo): ?>
     <p class="alert alert-danger" role="alert">Não foi possível carregar o catálogo.</p>
 <?php else: ?>

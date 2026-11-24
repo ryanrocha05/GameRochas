@@ -130,11 +130,20 @@ function alterar_produto(PDO $db, string $acao, ?int $id): string
     $db->beginTransaction();
     try {
         if ($acao !== 'criar') {
-            $consulta = $db->prepare('SELECT imagem FROM produtos WHERE id = ? FOR UPDATE');
+            $consulta = $db->prepare('SELECT imagem, estoque FROM produtos WHERE id = ? FOR UPDATE');
             $consulta->execute([$id]);
             $produto = $consulta->fetch();
             if (!$produto) {
                 throw new DomainException('Produto não encontrado.');
+            }
+            if ($acao === 'editar') {
+                $estoqueOriginal = filter_input(INPUT_POST, 'estoque_original', FILTER_VALIDATE_INT);
+                if (!is_int($estoqueOriginal) || $estoqueOriginal < 0) {
+                    throw new DomainException('Não foi possível conferir o estoque original. Revise o produto antes de salvar novamente.');
+                }
+                if ($estoqueOriginal !== (int) $produto['estoque']) {
+                    throw new DomainException('Outra operação alterou o estoque enquanto esta tela estava aberta. Revise o estoque atual antes de salvar novamente.');
+                }
             }
             $imagemAntiga = $produto['imagem'];
         }
@@ -266,6 +275,7 @@ require_once __DIR__ . '/_nav.php';
                 <input type="hidden" name="acao" value="<?= $produtoEdicao ? 'editar' : 'criar' ?>">
                 <?php if ($produtoEdicao): ?>
                     <input type="hidden" name="id" value="<?= e((string) $produtoEdicao['id']) ?>">
+                    <input type="hidden" name="estoque_original" value="<?= e((string) $produtoEdicao['estoque']) ?>">
                 <?php endif; ?>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">

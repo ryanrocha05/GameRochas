@@ -172,8 +172,8 @@ require __DIR__ . '/templates/header.php';
                     <?= csrf_campo() ?>
                     <input type="hidden" name="resumo" value="<?= e(assinatura_resumo($itens)) ?>">
                     <fieldset class="mb-3">
-                        <legend class="h4">Pagamento simulado</legend>
-                        <p>Esta compra é uma simulação e não gera cobrança. Use somente dados fictícios.</p>
+                        <legend class="h4">Forma de pagamento</legend>
+                        <p>Escolha a opção que ficará registrada no pedido. A confirmação do pedido não gera cobrança.</p>
                         <?php foreach (METODOS_PAGAMENTO as $valor => $rotulo): ?>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="forma_pagamento"
@@ -183,21 +183,21 @@ require __DIR__ . '/templates/header.php';
                         <?php endforeach; ?>
                     </fieldset>
                     <details class="mb-3">
-                        <summary>Campos de cartão para demonstração</summary>
-                        <label class="form-label mt-2" for="numero-cartao">Número fictício</label>
+                        <summary>Dados do cartão (deixe os campos em branco)</summary>
+                        <label class="form-label mt-2" for="numero-cartao">Número do cartão</label>
                         <input class="form-control" id="numero-cartao" inputmode="numeric" autocomplete="off">
                         <div class="row mt-2">
                             <div class="col">
-                                <label class="form-label" for="validade-cartao">Validade fictícia</label>
+                                <label class="form-label" for="validade-cartao">Validade</label>
                                 <input class="form-control" id="validade-cartao" placeholder="MM/AA" autocomplete="off">
                             </div>
                             <div class="col">
-                                <label class="form-label" for="codigo-cartao">CVV fictício</label>
+                                <label class="form-label" for="codigo-cartao">Código de segurança</label>
                                 <input class="form-control" id="codigo-cartao" inputmode="numeric" autocomplete="off">
                             </div>
                         </div>
                     </details>
-                    <button type="submit" class="btn btn-primary w-100">Confirmar compra simulada</button>
+                    <button type="submit" class="btn btn-primary w-100">Confirmar pedido</button>
                 </form>
             </div>
         </section>
